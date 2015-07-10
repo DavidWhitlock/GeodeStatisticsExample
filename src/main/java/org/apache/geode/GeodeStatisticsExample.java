@@ -1,13 +1,46 @@
 package org.apache.geode;
 
-import com.gemstone.gemfire.CancelCriterion;
+import com.gemstone.gemfire.*;
 import com.gemstone.gemfire.internal.LocalStatisticsFactory;
+import com.gemstone.gemfire.internal.StatisticsTypeFactoryImpl;
+
+import java.util.Random;
 
 public class GeodeStatisticsExample {
 
   public static void main(String[] args) {
-    startStatisticsArchiver();
+    StatisticsFactory statsFactory = startStatisticsArchiver();
+    createExampleStatistics(statsFactory);
     waitForProgramToBeTerminated();
+  }
+
+  private static void createExampleStatistics(StatisticsFactory statsFactory) {
+    StatisticsTypeFactory typeFactory = StatisticsTypeFactoryImpl.singleton();
+    StatisticsType type = typeFactory.createType("ExampleStatistics", "Example Statistics",
+      new StatisticDescriptor[]{
+        typeFactory.createIntCounter("sheepIveCounted", "How many sheep have I counted?", "sheep")
+      });
+    int sheepIveCountedId = type.nameToId("sheepIveCounted");
+
+    Statistics stats = statsFactory.createAtomicStatistics(type, "MyFirstStatistics");
+    updateExampleStatisticsInBackgroundThread(sheepIveCountedId, stats);
+  }
+
+  private static void updateExampleStatisticsInBackgroundThread(int sheepIveCountedId, Statistics stats) {
+    new Thread(() -> {
+      Random random = new Random();
+      while (true) {
+        int durationInMillis = random.nextInt(1000);
+        try {
+          Thread.sleep(durationInMillis);
+
+        } catch (InterruptedException e) {
+          return;
+        }
+
+        stats.incInt(sheepIveCountedId, 1);
+      }
+    }).start();
   }
 
   private static void waitForProgramToBeTerminated() {
@@ -22,8 +55,9 @@ public class GeodeStatisticsExample {
     }
   }
 
-  private static void startStatisticsArchiver() {
+  private static LocalStatisticsFactory startStatisticsArchiver() {
     LocalStatisticsFactory factory = new LocalStatisticsFactory(createStopper());
+    return factory;
 
   }
 
