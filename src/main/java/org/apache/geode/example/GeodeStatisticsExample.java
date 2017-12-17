@@ -1,6 +1,7 @@
 package org.apache.geode.example;
 
 import org.apache.geode.*;
+import org.apache.geode.distributed.internal.DistributionConfig;
 import org.apache.geode.internal.statistics.LocalStatisticsFactory;
 import org.apache.geode.internal.statistics.StatisticsTypeFactoryImpl;
 
@@ -9,9 +10,19 @@ import java.util.Random;
 public class GeodeStatisticsExample {
 
   public static void main(String[] args) {
+    enableThreadStatistics();
+
     StatisticsFactory statsFactory = startStatisticsArchiver();
     createExampleStatistics(statsFactory);
     waitForProgramToBeTerminated();
+  }
+
+  private static void enableThreadStatistics() {
+    System.setProperty(DistributionConfig.GEMFIRE_PREFIX + "enableThreadStats", "true");
+    System.setProperty(DistributionConfig.GEMFIRE_PREFIX + "enableCpuTime", "true");
+    System.setProperty(DistributionConfig.GEMFIRE_PREFIX + "enableContentionTime", "true");
+
+
   }
 
   private static void createExampleStatistics(StatisticsFactory statsFactory) {
