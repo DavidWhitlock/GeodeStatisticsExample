@@ -1,8 +1,8 @@
-package org.apache.geode;
+package org.apache.geode.example;
 
-import com.gemstone.gemfire.*;
-import com.gemstone.gemfire.internal.LocalStatisticsFactory;
-import com.gemstone.gemfire.internal.StatisticsTypeFactoryImpl;
+import org.apache.geode.*;
+import org.apache.geode.internal.statistics.LocalStatisticsFactory;
+import org.apache.geode.internal.statistics.StatisticsTypeFactoryImpl;
 
 import java.util.Random;
 
